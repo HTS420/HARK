@@ -320,15 +320,19 @@ def CRRAutilityP_invP(uP, h, gam, gamh):
     ----------
     uP : float
         Marginal utility value
+    h : float
+        Habit value
     gam : float
         Risk aversion
+    gamh : float
+           Habit strength
     
     Returns
     -------
     (unnamed) : float
         Marginal consumption corresponding to given marginal utility value
     '''
-    return( (-1.0/gam)*uP**(-1.0/gam-1.0) )
+    return( (h**gamh)**(1-gam)*(-1.0/gam)*(uP*(h**gamh)**(1-gam))**(-1.0/gam-1.0) )
 
 
 # ==============================================================================
