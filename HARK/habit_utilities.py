@@ -111,16 +111,16 @@ class NullFunc(object):
 # ==============================================================================
 # ============== Define utility functions        ===============================
 # ==============================================================================
-def CRRAutility(c, h, gam, gamh):
+def CRRAutility(c, H, gam, gamH):
     '''
     Evaluates constant relative risk aversion (CRRA) utility of consumption c
-    given risk aversion parameter gam, habit law of motion and habit strength gamh.
+    given risk aversion parameter gam, habit law of motion H and habit strength gamh.
     
     Parameters
     ----------
     c : float
         Consumption value
-    h : float
+    H : float
         Habit value
     gam : float
         Risk aversion
@@ -135,29 +135,29 @@ def CRRAutility(c, h, gam, gamh):
     Tests
     -----
     Test a value which should pass:
-    >>> c, h, gamma, gammah = 1.0, 1.0, 2.0, 1.0    # Set four values at once with Python syntax
-    >>> utility(c=c, h=h, gam=gamma, gamh=gammah)
+    >>> c, H, gamma, gammah = 1.0, 1.0, 2.0, 1.0    # Set four values at once with Python syntax
+    >>> utility(c=c, H=H, gam=gamma, gamh=gammah)
     -1.0
     '''
     if gam == 1:
-        return np.log(c / (h**gamh))
+        return np.log(c / (H**gamH))
     else:
-        return( ((c / h**gamh)**(1.0 - gam)) / (1.0 - gam) )
+        return( ((c / H**gamH)**(1.0 - gam)) / (1.0 - gam) )
 
-def CRRAutilityP(c, h, gam, gamh):
+def CRRAutilityP(c, H, gam, gamH):
     '''
     Evaluates constant relative risk aversion (CRRA) marginal utility of consumption
-    c given risk aversion parameter gam, habit law of motion and habit strength gamh.
+    c given risk aversion parameter gam, habit law of motion H and habit strength gamh.
     
     Parameters
     ----------
     c : float
         Consumption value
-    h : float
+    H : float
         Habit value
     gam : float
         Risk aversion
-    gamh : float
+    gamH : float
            Habit strength
     
     Returns
@@ -165,18 +165,18 @@ def CRRAutilityP(c, h, gam, gamh):
     (unnamed) : float
         Marginal utility
     '''
-    return( ((c**-gam) / ((h**gamh)**(1-gam)))
+    return( ((c**-gam) / ((H**gamH)**(1-gam)))
 
-def CRRAutilityPP(c, h, gam, gamh):
+def CRRAutilityPP(c, H, gam, gamH):
     '''
     Evaluates constant relative risk aversion (CRRA) marginal marginal utility of
-    consumption c given risk aversion parameter gam, habit law of motion and habit strength gamh.
+    consumption c given risk aversion parameter gam, habit law of motion H and habit strength gamh.
     
     Parameters
     ----------
     c : float
         Consumption value
-    h : float
+    H : float
         Habit value
     gam : float
         Risk aversion
@@ -188,22 +188,22 @@ def CRRAutilityPP(c, h, gam, gamh):
     (unnamed) : float
         Marginal marginal utility
     '''
-    return( (-gam*c**(-gam-1.0)) / ((h**gamh)**(1-gam)))
+    return( (-gam*c**(-gam-1.0)) / ((H**gamH)**(1-gam)))
 
-def CRRAutilityPPP(c, h, gam, gamh):
+def CRRAutilityPPP(c, H, gam, gamH):
     '''
     Evaluates constant relative risk aversion (CRRA) marginal marginal marginal
-    utility of consumption c given risk aversion parameter gam, habit law of motion and habit strength gamh.
+    utility of consumption c given risk aversion parameter gam, habit law of motion H and habit strength gamh.
     
     Parameters
     ----------
     c : float
         Consumption value
-    h : float
+    H : float
         Habit value
     gam : float
         Risk aversion
-    gamh : float
+    gamH : float
            Habit strength
            
     Returns
@@ -211,22 +211,22 @@ def CRRAutilityPPP(c, h, gam, gamh):
     (unnamed) : float
         Marginal marginal marginal utility
     '''
-    return( ((gam+1.0)*gam*c**(-gam-2.0)) / ((h**gamh)**(1-gam))) )
+    return( ((gam+1.0)*gam*c**(-gam-2.0)) / ((H**gamH)**(1-gam))) )
 
-def CRRAutilityPPPP(c, h, gam, gamh):
+def CRRAutilityPPPP(c, H, gam, gamH):
     '''
     Evaluates constant relative risk aversion (CRRA) marginal marginal marginal
-    marginal utility of consumption c given risk aversion parameter gam, habit law of motion and habit strength gamh.
+    marginal utility of consumption c given risk aversion parameter gam, habit law of motion H and habit strength gamh.
     
     Parameters
     ----------
     c : float
         Consumption value
-    h : float
+    H : float
         Habit value
     gam : float
         Risk aversion
-    gamh : float
+    gamH : float
            Habit strength
     
     Returns
@@ -234,18 +234,18 @@ def CRRAutilityPPPP(c, h, gam, gamh):
     (unnamed) : float
         Marginal marginal marginal marginal utility
     '''
-    return( (-(gam+2.0)*(gam+1.0)*gam*c**(-gam-3.0)) / ((h**gamh)**(1-gam))) )
+    return( (-(gam+2.0)*(gam+1.0)*gam*c**(-gam-3.0)) / ((H**gamH)**(1-gam))) )
 
-def CRRAutility_inv(c, h, gam, gamh):
+def CRRAutility_inv(c, H, gam, gamH):
     '''
-    Evaluates the inverse of the CRRA utility function (with risk aversion parameter gam, habit law of motion and habit strength gamh.)
+    Evaluates the inverse of the CRRA utility function (with risk aversion parameter gam, habit law of motion H and habit strength gamh.)
     at a given utility level u.
     
     Parameters
     ----------
     c : float
         Consumption value
-    h : float
+    H : float
         Habit value
     gam : float
         Risk aversion
@@ -258,24 +258,24 @@ def CRRAutility_inv(c, h, gam, gamh):
         Consumption corresponding to given utility value
     '''
     if gam == 1:
-        return (np.exp(u)*(h**gamh))
+        return (np.exp(u)*(H**gamH))
     else:
-        return( ((1.0-gam)*u)**(1/(1.0-gam))*(h**gamh) )
+        return( ((1.0-gam)*u)**(1/(1.0-gam))*(H**gamH) )
 
-def CRRAutilityP_inv(uP, h, gam, gamh):
+def CRRAutilityP_inv(uP, H, gam, gamH):
     '''
-    Evaluates the inverse of the CRRA marginal utility function (with risk aversion parameter gam, habit law of motion and habit strength gamh.)
+    Evaluates the inverse of the CRRA marginal utility function (with risk aversion parameter gam, habit law of motion H and habit strength gamh.)
     at a given marginal utility level uP.
     
     Parameters
     ----------
     uP : float
         Marginal utility value
-    h : float
+    H : float
         Habit value
     gam : float
         Risk aversion
-    gamh : float
+    gamH : float
            Habit strength
     
     Returns
@@ -283,22 +283,22 @@ def CRRAutilityP_inv(uP, h, gam, gamh):
     (unnamed) : float
         Consumption corresponding to given marginal utility value.
     '''
-    return( (uP*(h**gamh)**(1-gam))**(-1.0/gam) )
+    return( (uP*(H**gamH)**(1-gam))**(-1.0/gam) )
 
-def CRRAutility_invP(u, h, gam, gamh):
+def CRRAutility_invP(u, H, gam, gamH):
     '''
-    Evaluates the derivative of the inverse of the CRRA utility function (with risk aversion parameter gam, habit law of motion and habit strength gamh.)
+    Evaluates the derivative of the inverse of the CRRA utility function (with risk aversion parameter gam, habit law of motion H and habit strength gamh.)
     at a given utility level u.
     
     Parameters
     ----------
     u : float
         Utility value
-    h : float
+    H : float
         Habit value
     gam : float
         Risk aversion
-    gamh : float
+    gamH : float
            Habit strength
         
     Returns
@@ -307,24 +307,24 @@ def CRRAutility_invP(u, h, gam, gamh):
         Marginal consumption corresponding to given utility value
     '''
     if gam == 1:
-        return (np.exp(u)*(h**gamh))
+        return (np.exp(u)*(H**gamH))
     else:
-        return( (h**gamh)*((1.0-gam)*u)**(gam/(1.0-gam)) )
+        return( (H**gamH)*((1.0-gam)*u)**(gam/(1.0-gam)) )
 
-def CRRAutilityP_invP(uP, h, gam, gamh):
+def CRRAutilityP_invP(uP, H, gam, gamH):
     '''
     Evaluates the derivative of the inverse of the CRRA marginal utility function
-    (with risk aversion parameter gam, habit law of motion and habit strength gamh) at a given marginal utility level uP.
+    (with risk aversion parameter gam, habit law of motion H and habit strength gamh) at a given marginal utility level uP.
     
     Parameters
     ----------
     uP : float
         Marginal utility value
-    h : float
+    H : float
         Habit value
     gam : float
         Risk aversion
-    gamh : float
+    gamH : float
            Habit strength
     
     Returns
@@ -332,7 +332,7 @@ def CRRAutilityP_invP(uP, h, gam, gamh):
     (unnamed) : float
         Marginal consumption corresponding to given marginal utility value
     '''
-    return( (h**gamh)**(1-gam)*(-1.0/gam)*(uP*(h**gamh)**(1-gam))**(-1.0/gam-1.0) )
+    return( (H**gamH)**(1-gam)*(-1.0/gam)*(uP*(H**gamH)**(1-gam))**(-1.0/gam-1.0) )
 
 
 # ==============================================================================
