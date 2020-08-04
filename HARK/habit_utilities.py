@@ -26,6 +26,7 @@ import warnings
 def memoize(obj):
    '''
    A decorator to (potentially) make functions more efficient.
+   
    With this decorator, functions will "remember" if they have been evaluated with given inputs
    before.  If they have, they will "remember" the outputs that have already been calculated
    for those inputs, rather than calculating them again.
@@ -47,10 +48,12 @@ def memoize(obj):
 def getArgNames(function):
     '''
     Returns a list of strings naming all of the arguments for the passed function.
+    
     Parameters
     ----------
     function : function
         A function whose argument names are wanted.
+    
     Returns
     -------
     argNames : [string]
@@ -85,10 +88,12 @@ class NullFunc(object):
         Trivial distance metric that only cares whether the other object is also
         an instance of NullFunc.  Intentionally does not inherit from HARKobject
         as this might create dependency problems.
+        
         Parameters
         ----------
         other : any
             Any object for comparison to this instance of NullFunc.
+        
         Returns
         -------
         (unnamed) : float
@@ -106,295 +111,224 @@ class NullFunc(object):
 # ==============================================================================
 # ============== Define utility functions        ===============================
 # ==============================================================================
-def CRRAutility(c, gam):
+def CRRAutility(c, h, gam, gamh):
     '''
     Evaluates constant relative risk aversion (CRRA) utility of consumption c
-    given risk aversion parameter gam.
+    given risk aversion parameter gam, habit law of motion and habit strength gamh.
+    
     Parameters
     ----------
     c : float
         Consumption value
+    h : float
+        Habit value
     gam : float
         Risk aversion
+    gamh : float
+           Habit strength
+    
     Returns
     -------
     (unnamed) : float
         Utility
+    
     Tests
     -----
     Test a value which should pass:
-    >>> c, gamma = 1.0, 2.0    # Set two values at once with Python syntax
-    >>> utility(c=c, gam=gamma)
+    >>> c, h, gamma, gammah = 1.0, 1.0, 2.0, 1.0    # Set four values at once with Python syntax
+    >>> utility(c=c, h=h, gam=gamma, gamh=gammah)
     -1.0
     '''
     if gam == 1:
-        return np.log(c)
+        return np.log(c / (h**gamh))
     else:
-        return( c**(1.0 - gam) / (1.0 - gam) )
+        return( ((c / h**gamh)**(1.0 - gam)) / (1.0 - gam) )
 
-def CRRAutilityP(c, gam):
+def CRRAutilityP(c, h, gam, gamh):
     '''
     Evaluates constant relative risk aversion (CRRA) marginal utility of consumption
-    c given risk aversion parameter gam.
+    c given risk aversion parameter gam, habit law of motion and habit strength gamh.
+    
     Parameters
     ----------
     c : float
         Consumption value
+    h : float
+        Habit value
     gam : float
         Risk aversion
+    gamh : float
+           Habit strength
+    
     Returns
     -------
     (unnamed) : float
         Marginal utility
     '''
-    return( c**-gam )
+    return( ((c**-gam) / ((h**gamh)**(1-gam)))
 
-def CRRAutilityPP(c, gam):
+def CRRAutilityPP(c, h, gam, gamh):
     '''
     Evaluates constant relative risk aversion (CRRA) marginal marginal utility of
-    consumption c given risk aversion parameter gam.
+    consumption c given risk aversion parameter gam, habit law of motion and habit strength gamh.
+    
     Parameters
     ----------
     c : float
         Consumption value
+    h : float
+        Habit value
     gam : float
         Risk aversion
+    gamh : float
+           Habit strength
+        
     Returns
     -------
     (unnamed) : float
         Marginal marginal utility
     '''
-    return( -gam*c**(-gam-1.0) )
+    return( (-gam*c**(-gam-1.0)) / ((h**gamh)**(1-gam)))
 
-def CRRAutilityPPP(c, gam):
+def CRRAutilityPPP(c, h, gam, gamh):
     '''
     Evaluates constant relative risk aversion (CRRA) marginal marginal marginal
-    utility of consumption c given risk aversion parameter gam.
+    utility of consumption c given risk aversion parameter gam, habit law of motion and habit strength gamh.
+    
     Parameters
     ----------
     c : float
         Consumption value
+    h : float
+        Habit value
     gam : float
         Risk aversion
+    gamh : float
+           Habit strength
+           
     Returns
     -------
     (unnamed) : float
         Marginal marginal marginal utility
     '''
-    return( (gam+1.0)*gam*c**(-gam-2.0) )
+    return( ((gam+1.0)*gam*c**(-gam-2.0)) / ((h**gamh)**(1-gam))) )
 
-def CRRAutilityPPPP(c, gam):
+def CRRAutilityPPPP(c, h, gam, gamh):
     '''
     Evaluates constant relative risk aversion (CRRA) marginal marginal marginal
-    marginal utility of consumption c given risk aversion parameter gam.
+    marginal utility of consumption c given risk aversion parameter gam, habit law of motion and habit strength gamh.
+    
     Parameters
     ----------
     c : float
         Consumption value
+    h : float
+        Habit value
     gam : float
         Risk aversion
+    gamh : float
+           Habit strength
+    
     Returns
     -------
     (unnamed) : float
         Marginal marginal marginal marginal utility
     '''
-    return( -(gam+2.0)*(gam+1.0)*gam*c**(-gam-3.0) )
+    return( (-(gam+2.0)*(gam+1.0)*gam*c**(-gam-3.0)) / ((h**gamh)**(1-gam))) )
 
-def CRRAutility_inv(u, gam):
+def CRRAutility_inv(c, h, gam, gamh):
     '''
-    Evaluates the inverse of the CRRA utility function (with risk aversion para-
-    meter gam) at a given utility level u.
+    Evaluates the inverse of the CRRA utility function (with risk aversion parameter gam, habit law of motion and habit strength gamh.)
+    at a given utility level u.
+    
     Parameters
     ----------
-    u : float
-        Utility value
+    c : float
+        Consumption value
+    h : float
+        Habit value
     gam : float
         Risk aversion
+    gamh : float
+           Habit strength
+    
     Returns
     -------
     (unnamed) : float
         Consumption corresponding to given utility value
     '''
     if gam == 1:
-        return np.exp(u)
+        return (np.exp(u)*(h**gamh))
     else:
-        return( ((1.0-gam)*u)**(1/(1.0-gam)) )
+        return( ((1.0-gam)*u)**(1/(1.0-gam))*(h**gamh) )
 
-def CRRAutilityP_inv(uP, gam):
+def CRRAutilityP_inv(uP, h, gam, gamh):
     '''
-    Evaluates the inverse of the CRRA marginal utility function (with risk aversion
-    parameter gam) at a given marginal utility level uP.
+    Evaluates the inverse of the CRRA marginal utility function (with risk aversion parameter gam, habit law of motion and habit strength gamh.)
+    at a given marginal utility level uP.
+    
     Parameters
     ----------
     uP : float
         Marginal utility value
+    h : float
+        Habit value
     gam : float
         Risk aversion
+    gamh : float
+           Habit strength
+    
     Returns
     -------
     (unnamed) : float
         Consumption corresponding to given marginal utility value.
     '''
-    return( uP**(-1.0/gam) )
+    return( (uP*(h**gamh)**(1-gam))**(-1.0/gam) )
 
-def CRRAutility_invP(u, gam):
+def CRRAutility_invP(u, h, gam, gamh):
     '''
-    Evaluates the derivative of the inverse of the CRRA utility function (with
-    risk aversion parameter gam) at a given utility level u.
+    Evaluates the derivative of the inverse of the CRRA utility function (with risk aversion parameter gam, habit law of motion and habit strength gamh.)
+    at a given utility level u.
+    
     Parameters
     ----------
     u : float
         Utility value
+    h : float
+        Habit value
     gam : float
         Risk aversion
+    gamh : float
+           Habit strength
+        
     Returns
     -------
     (unnamed) : float
         Marginal consumption corresponding to given utility value
     '''
     if gam == 1:
-        return np.exp(u)
+        return (np.exp(u)*(h**gamh))
     else:
-        return( ((1.0-gam)*u)**(gam/(1.0-gam)) )
+        return( (h**gamh)*((1.0-gam)*u)**(gam/(1.0-gam)) )
 
-def CRRAutilityP_invP(uP, gam):
+def CRRAutilityP_invP(uP, h, gam, gamh):
     '''
     Evaluates the derivative of the inverse of the CRRA marginal utility function
-    (with risk aversion parameter gam) at a given marginal utility level uP.
+    (with risk aversion parameter gam, habit law of motion and habit strength gamh) at a given marginal utility level uP.
+    
     Parameters
     ----------
     uP : float
         Marginal utility value
     gam : float
         Risk aversion
+    
     Returns
     -------
     (unnamed) : float
         Marginal consumption corresponding to given marginal utility value
     '''
     return( (-1.0/gam)*uP**(-1.0/gam-1.0) )
-
-
-def CARAutility(c, alpha):
-    '''
-    Evaluates constant absolute risk aversion (CARA) utility of consumption c
-    given risk aversion parameter alpha.
-    Parameters
-    ----------
-    c: float
-        Consumption value
-    alpha: float
-        Risk aversion
-    Returns
-    -------
-    (unnamed): float
-        Utility
-    '''
-    return( 1 - np.exp(-alpha*c)/alpha )
-
-def CARAutilityP(c, alpha):
-    '''
-    Evaluates constant absolute risk aversion (CARA) marginal utility of
-    consumption c given risk aversion parameter alpha.
-    Parameters
-    ----------
-    c: float
-        Consumption value
-    alpha: float
-        Risk aversion
-    Returns
-    -------
-    (unnamed): float
-        Marginal utility
-    '''
-    return( np.exp(-alpha*c) )
-
-def CARAutilityPP(c, alpha):
-    '''
-    Evaluates constant absolute risk aversion (CARA) marginal marginal utility
-    of consumption c given risk aversion parameter alpha.
-    Parameters
-    ----------
-    c: float
-        Consumption value
-    alpha: float
-        Risk aversion
-    Returns
-    -------
-    (unnamed): float
-        Marginal marginal utility
-    '''
-    return( -alpha*np.exp(-alpha*c) )
-
-def CARAutilityPPP(c, alpha):
-    '''
-    Evaluates constant absolute risk aversion (CARA) marginal marginal marginal
-    utility of consumption c given risk aversion parameter alpha.
-    Parameters
-    ----------
-    c: float
-        Consumption value
-    alpha: float
-        Risk aversion
-    Returns
-    -------
-    (unnamed): float
-        Marginal marginal marginal utility
-    '''
-    return( alpha**2.0*np.exp(-alpha*c) )
-
-def CARAutility_inv(u, alpha):
-    '''
-    Evaluates inverse of constant absolute risk aversion (CARA) utility function
-    at utility level u given risk aversion parameter alpha.
-    Parameters
-    ----------
-    u: float
-        Utility value
-    alpha: float
-        Risk aversion
-    Returns
-    -------
-    (unnamed): float
-        Consumption value corresponding to u
-    '''
-    return( -1.0/alpha * np.log(alpha*(1-u)) )
-
-def CARAutilityP_inv(u, alpha):
-    '''
-    Evaluates the inverse of constant absolute risk aversion (CARA) marginal
-    utility function at marginal utility uP given risk aversion parameter alpha.
-    Parameters
-    ----------
-    u: float
-        Utility value
-    alpha: float
-        Risk aversion
-    Returns
-    -------
-    (unnamed): float
-        Consumption value corresponding to uP
-    '''
-    return( -1.0/alpha*np.log(u) )
-
-def CARAutility_invP(u, alpha):
-    '''
-    Evaluates the derivative of inverse of constant absolute risk aversion (CARA)
-    utility function at utility level u given risk aversion parameter alpha.
-    Parameters
-    ----------
-    u: float
-        Utility value
-    alpha: float
-        Risk aversion
-    Returns
-    -------
-    (unnamed): float
-        Marginal onsumption value corresponding to u
-    '''
-    return( 1.0/(alpha*(1.0-u)) )
-
-
 
 
 # ==============================================================================
